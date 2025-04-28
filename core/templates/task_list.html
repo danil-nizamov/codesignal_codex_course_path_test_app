@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Tracker</title>
+    <style>
+        body {
+            font-family: arial, sans-serif; margin: 2em;
+            background: #fcfcfc;
+        }
+        .task {
+            padding: 0.2em 0.5em; margin-bottom: 0.5em; border-bottom: 1px dotted #ccc;
+        }
+        .done {
+            text-decoration: line-through; color: #888;
+        }
+        .actions {
+            margin-left: 1em;
+        }
+        form.inline { display: inline; }
+        form.new-task { margin-bottom: 1em; }
+        button { background: #eee; border: 1px solid #ccc; border-radius: 3px; cursor: pointer;}
+    </style>
+</head>
+<body>
+    <h2>Task Tracker</h2>
+
+    <form method="post" class="new-task">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="New task..." required style="width:200px">
+        <button type="submit">Add</button>
+    </form>
+
+    <div>
+        {% for task in tasks %}
+            <div class="task{% if task.done %} done{% endif %}">
+                <form method="post" action="{% url 'toggle_task' task.id %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit">{% if task.done %}Undo{% else %}Done{% endif %}</button>
+                </form>
+                {{ task.title }}
+                <span class="actions">
+                    <form method="post" action="{% url 'delete_task' task.id %}" class="inline" onsubmit="return confirm('Delete this task?');">
+                        {% csrf_token %}
+                        <button type="submit">Delete</button>
+                    </form>
+                </span>
+            </div>
+        {% empty %}
+           <p>No tasks yet!</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
